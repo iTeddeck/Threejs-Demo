@@ -1,2 +1,4 @@
 # Threejs-Demo
 My first program in threejs for my research project under Dr. Scott Frees. Unofficially titled cube dodge.
+
+This program is the start to my research into virtual reality with Dr. Scott Frees from Ramapo College. The goal is to develop a mini game/demo in threejs to test out its capabilities while getting comfortable and familiar with it. Ultimately I will be developing the same demo in Unity to make a side-by-side comparison. At the end, I will get together with Dr. Frees and discuss whether threejs or Unity is better to continue studying. This will all eventually lead up to me creating a game in which the player can control the main character with his/her own full body using the Oculus Rift and the tracking system we have in our lab. Incorporating other tools like the Omni-treadmill are in consideration also.
