@@ -65,6 +65,7 @@ var MovingCube2;
 var MovingCube3;
 var MovingCube4;
 var MovingCube5;
+var wall;
 
 var collidableMeshList = [];
 
@@ -217,13 +218,10 @@ function init()
 	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff} );
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe:true } );
 	
-	var wall = new THREE.Mesh(wallGeometry, wallMaterial);
-	wall.position.set(0, 50, 410);
-	scene.add(wall);
-	collidableMeshList.push(wall);
-	var wall = new THREE.Mesh(wallGeometry, wireMaterial);
-	wall.position.set(0, 50, 410);
-	scene.add(wall);
+	wall = new THREE.Mesh(wallGeometry, wallMaterial);
+	wall.position.set(0, 0, 0);
+	camera.add(wall);
+	
 }
 
 // SOUND
@@ -304,11 +302,13 @@ function update()
 		MovingCube5.position.y = Math.floor(Math.random()*200 + 25.1);
 	}
 	
+	
 	// COLLISION DETECTION
 	var originPoint = wall.position.clone();
 	
 	for (var vertexIndex = 0; vertexIndex < wall.geometry.vertices.length; vertexIndex++)
 	{		
+		//console.log("Vertex " + vertexIndex);
 		var localVertex = wall.geometry.vertices[vertexIndex].clone();
 		var globalVertex = localVertex.applyMatrix4( wall.matrix );
 		var directionVector = globalVertex.sub( wall.position );
@@ -316,7 +316,11 @@ function update()
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		var collisionResults = ray.intersectObjects( collidableMeshList );
 		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-			play_multi_sound('multiaudio1');
+			console.log("COLLISION");
+			//play_multi_sound('multiaudio1');
+		}
+		else {
+			//console.log("NO COLLISION");
 		}
 	}
 	stats.update();
