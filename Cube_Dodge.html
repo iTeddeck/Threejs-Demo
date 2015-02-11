@@ -67,6 +67,24 @@ var MovingCube4;
 var MovingCube5;
 var wall;
 
+var mov1 = 5;
+var mov2 = 6;
+var mov3 = 7;
+var mov4 = 8;
+var mov5 = 9;
+
+var once1 = false;
+var once2 = false;
+var once3 = false;
+var once4 = false;
+var once5 = false;
+
+var side1 = false;
+var side2 = false;
+var side3 = false;
+var side4 = false;
+var side5 = false;
+
 var collidableMeshList = [];
 
 var arrowList = [];
@@ -140,7 +158,7 @@ function init()
 	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
 	MovingCube1 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube1.position.set(0, 25.1, 0);
+	MovingCube1.position.set(0, 25.1, -400);
 	collidableMeshList.push(MovingCube1);
 	scene.add( MovingCube1 );
 	
@@ -154,7 +172,7 @@ function init()
 	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
 	MovingCube2 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube2.position.set(100, 25.1, 0);
+	MovingCube2.position.set(100, 25.1, -400);
 	collidableMeshList.push(MovingCube2);
 	scene.add( MovingCube2 );
 	
@@ -168,7 +186,7 @@ function init()
 	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
 	MovingCube3 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube3.position.set(-100, 25.1, 0);
+	MovingCube3.position.set(-100, 25.1, -400);
 	collidableMeshList.push(MovingCube3);
 	scene.add( MovingCube3 );
 	
@@ -182,7 +200,7 @@ function init()
 	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
 	MovingCube4 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube4.position.set(200, 25.1, 0);
+	MovingCube4.position.set(200, 25.1, -400);
 	collidableMeshList.push(MovingCube4);
 	scene.add( MovingCube4 );
 	
@@ -196,7 +214,7 @@ function init()
 	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
 	MovingCube5 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube5.position.set(-200, 25.1, 0);
+	MovingCube5.position.set(-200, 25.1, -400);
 	collidableMeshList.push(MovingCube5);
 	scene.add( MovingCube5 );
 	
@@ -214,13 +232,19 @@ function init()
 	
 	// CAMERA OBJECT	
 	
-	var wallGeometry = new THREE.CubeGeometry( 60, 30, 20, 1, 1, 1 );
-	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x8888ff} );
-	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe:true } );
+	var wallGeometry = new THREE.CubeGeometry( 120, 120, 20, 1, 1, 1 );
+	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} );
+	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe:true} );
 	
 	wall = new THREE.Mesh(wallGeometry, wallMaterial);
-	wall.position.set(0, 0, 0);
+	wall.position.set(0, 0, 400);
 	camera.add(wall);
+	
+	var blockGeometry = new THREE.CubeGeometry( 120, 40, 20, 1, 1, 1 );
+	blockd = new THREE.Mesh(blockGeometry, wallMaterial);
+	blockd.position.set(0, 20, 300);
+	scene.add(blockd);
+	
 	
 }
 
@@ -250,30 +274,39 @@ function update()
 	keyboard.update();
 	
 	var delta = clock.getDelta(); // seconds.
-	var moveDistance = 200 * delta; // 200 pixels per second
+	var moveDistance1 = 200 * delta; // 200 pixels per second
+	var moveDistance2 = 200 * delta;
+	var moveDistance3 = 200 * delta;
+	var moveDistance4 = 200 * delta;
+	var moveDistance5 = 200 * delta;
 	
 	// KEYBOARD CONTROL
 	if ( keyboard.pressed("up") ) {
 		camera.position.y += 10;
+		blockd.position.y += 10;
 	}
 	if ( keyboard.pressed("down") ) {
 		if (camera.position.y > 50) {
 			camera.position.y -= 10;
+			blockd.position.y -= 10;
 		}
 	}
 	if ( keyboard.pressed("right") ) {
 		camera.position.x += 10;
+		blockd.position.x += 10;
 	}
 	if ( keyboard.pressed("left") ) {
 		camera.position.x -= 10;
+		blockd.position.x -= 10;
 	}
 	
 	// CUBE MOVEMENT
-	MovingCube1.position.z += moveDistance + 5;
-	MovingCube2.position.z += moveDistance + 6;
-	MovingCube3.position.z += moveDistance + 7;
-	MovingCube4.position.z += moveDistance + 8;
-	MovingCube5.position.z += moveDistance + 9;
+		MovingCube1.position.z += moveDistance1 + mov1;
+		MovingCube2.position.z += moveDistance2 + mov2;
+		MovingCube3.position.z += moveDistance3 + mov3;
+		MovingCube4.position.z += moveDistance4 + mov4;
+		MovingCube5.position.z += moveDistance5 + mov5;
+	//}
 	
 	// RESETTING CUBES
 	if ( MovingCube1.position.z > 500) {
@@ -302,21 +335,95 @@ function update()
 		MovingCube5.position.y = Math.floor(Math.random()*200 + 25.1);
 	}
 	
+	// BOUNCING AND MOVING CUBES
+	// NEED TO WORK ON CUBES FLYING OFF IN DISTANCE
+	if ( MovingCube1.position.z < -400) {
+		once1 = false;
+		if (side1 == false) {
+			moveDistance1 *= -1;
+			mov1 *= -1;
+			side1 = true;
+		}
+	}
+	if ( MovingCube2.position.z < -400) {
+		once2 = false;
+		if (side2 == false) {
+			moveDistance2 *= -1;
+			mov2 *= -1;
+			side2 = true;
+		}
+	}
+	if ( MovingCube3.position.z < -400) {
+		once3 = false;
+		if (side3 == false) {
+			moveDistance3 *= -1;
+			mov3 *= -1;
+			side3 = true;
+		}
+	}
+	if ( MovingCube4.position.z < -400) {
+		once4 = false;
+		if (side4 == false) {
+			moveDistance4 *= -1;
+			mov4 *= -1;
+			side4 = true;
+		}
+	}
+	if ( MovingCube5.position.z < -400) {
+		once5 = false;
+		if (side5 == false) {
+			moveDistance5 *= -1;
+			mov5 *= -1;
+			side5 = true;
+		}
+	}
+	
 	
 	// COLLISION DETECTION
-	var originPoint = wall.position.clone();
+	var originPoint = blockd.position.clone();
 	
-	for (var vertexIndex = 0; vertexIndex < wall.geometry.vertices.length; vertexIndex++)
+	for (var vertexIndex = 0; vertexIndex < blockd.geometry.vertices.length; vertexIndex++)
 	{		
 		//console.log("Vertex " + vertexIndex);
-		var localVertex = wall.geometry.vertices[vertexIndex].clone();
-		var globalVertex = localVertex.applyMatrix4( wall.matrix );
-		var directionVector = globalVertex.sub( wall.position );
+		var localVertex = blockd.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( blockd.matrix );
+		var directionVector = globalVertex.sub( blockd.position );
 		
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		// NEED TO SEPARATE COLLIDABLE MESH LIST
 		var collisionResults = ray.intersectObjects( collidableMeshList );
 		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
 			console.log("COLLISION");
+			if (once1 == false) {
+				side1 == false
+				moveDistance1 *= -1;
+				mov1 *= -1;
+				once1 = true;
+			}
+			if (once2 == false) {
+				side2 == false
+				moveDistance2 *= -1;
+				mov2 *= -1;
+				once2 = true;
+			}
+			if (once3 == false) {
+				side3 == false
+				moveDistance3 *= -1;
+				mov3 *= -1;
+				once3 = true;
+			}
+			if (once4 == false) {
+				side4 == false
+				moveDistance4 *= -1;
+				mov4 *= -1;
+				once4 = true;
+			}
+			if (once5 == false) {
+				side5 == false
+				moveDistance5 *= -1;
+				mov5 *= -1;
+				once5 = true;
+			}
 			//play_multi_sound('multiaudio1');
 		}
 		else {
