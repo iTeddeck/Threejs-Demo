@@ -13,7 +13,7 @@
 <script src="js/Stats.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/KeyboardState.js"></script>
-<script src="js/THREEx.FullScreen.js"></script>
+<script src="js/THREEx.FullScreen.js"></script> 
 <script src="js/THREEx.WindowResize.js"></script>
 
 <audio id="audiotag1" src="sounds/06 Far Horizons.mp3" preload="auto"></audio>
@@ -60,30 +60,8 @@ var keyboard = new KeyboardState();
 // custom global variables
 var mesh;
 
-var MovingCube1;
-var MovingCube2;
-var MovingCube3;
-var MovingCube4;
-var MovingCube5;
-var wall;
-
-var mov1 = 5;
-var mov2 = 6;
-var mov3 = 7;
-var mov4 = 8;
-var mov5 = 9;
-
-var once1 = false;
-var once2 = false;
-var once3 = false;
-var once4 = false;
-var once5 = false;
-
-var side1 = false;
-var side2 = false;
-var side3 = false;
-var side4 = false;
-var side5 = false;
+var xRand = Math.floor(Math.random()*400 - 200);
+var yRand = Math.floor(Math.random()*200 + 25.1);
 
 var collidableMeshList = [];
 
@@ -146,80 +124,69 @@ function init()
 	// CUSTOM //
 	////////////
 	
+	var MovingCube = function (cWidth, cHeight, cDepth, xPos, yPos, zPos, movVal) {
+		hitBlueBlock = false;
+		hitOtherSide = false;
+		delta = clock.getDelta();
+		moveDistance = 200 * delta;
+		mov = movVal;
+		
+		
+		materialArray = [];
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
+		MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
+		MovingCubeGeom = new THREE.CubeGeometry( cWidth, cHeight, cDepth, 1, 1, 1, materialArray );
+		mc = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
+		mc.position.set(xPos, yPos, zPos); // -200, 25.1, -400
+		collidableMeshList.push(mc);
+		scene.add( mc );
+		
+		this.setPos = function(newX, newY, newZ) {
+			mc.position.x = newX;
+			mc.position.y = newY;
+			mc.position.z = newZ;
+		}
+		
+		this.move = function() {
+			mc.position.z += moveDistance + mov;
+			
+			if ( mc.position.z > 500) {
+				mc.setPos(xRand, yRand, 0);
+			}
+			
+			if ( mc.position.z < -400) {
+				hitOtherSide = false;
+				if (hitBlueBlock == false) {
+					moveDistance *= -1;
+					mov *= -1;
+					hitBlueBlock = true;
+				}
+			}
+		}
+		
+		this.bounceBack = function() {
+			if (hitOtherSide == false) {
+				hitBlueBlock = false
+				moveDistance *= -1;
+				mov *= -1;
+				hitOtherSide = true;
+			}
+		}
+	}
+	
 	// ADDING CUBES
-	
-	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
-	MovingCube1 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube1.position.set(0, 25.1, -400);
-	collidableMeshList.push(MovingCube1);
-	scene.add( MovingCube1 );
-	
-	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
-	MovingCube2 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube2.position.set(100, 25.1, -400);
-	collidableMeshList.push(MovingCube2);
-	scene.add( MovingCube2 );
-	
-	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
-	MovingCube3 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube3.position.set(-100, 25.1, -400);
-	collidableMeshList.push(MovingCube3);
-	scene.add( MovingCube3 );
-	
-	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
-	MovingCube4 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube4.position.set(200, 25.1, -400);
-	collidableMeshList.push(MovingCube4);
-	scene.add( MovingCube4 );
-	
-	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-	var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-	var MovingCubeGeom = new THREE.CubeGeometry( 50, 50, 50, 1, 1, 1, materialArray );
-	MovingCube5 = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-	MovingCube5.position.set(-200, 25.1, -400);
-	collidableMeshList.push(MovingCube5);
-	scene.add( MovingCube5 );
+	var movingCube1 = new MovingCube(50, 50, 50, 0, 25.1, -400, 5);
+	var movingCube2 = new MovingCube(50, 50, 50, 100, 25.1, -400, 6);
+	var movingCube3 = new MovingCube(50, 50, 50, -100, 25.1, -400, 7);
+	var movingCube4 = new MovingCube(50, 50, 50, 200, 25.1, -400, 8);
+	var movingCube5 = new MovingCube(50, 50, 50, -200, 25.1, -400, 9);
 	
 	// SOUND
-	
 	play_single_sound();
 	
 	var channel_max = 5;	// number of channels
@@ -230,20 +197,12 @@ function init()
 		audiochannels[a]['finished'] = -1;	// expected end time for this channel
 	}
 	
-	// CAMERA OBJECT	
-	
-	var wallGeometry = new THREE.CubeGeometry( 120, 120, 20, 1, 1, 1 );
-	var wallMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} );
-	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe:true} );
-	
-	wall = new THREE.Mesh(wallGeometry, wallMaterial);
-	wall.position.set(0, 0, 400);
-	camera.add(wall);
-	
+	// BLOCK OBJECT	
 	var blockGeometry = new THREE.CubeGeometry( 120, 40, 20, 1, 1, 1 );
-	blockd = new THREE.Mesh(blockGeometry, wallMaterial);
-	blockd.position.set(0, 20, 300);
-	scene.add(blockd);
+	var blockMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} );
+	blockW = new THREE.Mesh(blockGeometry, blockMaterial);
+	blockW.position.set(0, -20, -100);
+	camera.add(blockW);
 	
 	
 }
@@ -273,157 +232,50 @@ function update()
 {
 	keyboard.update();
 	
-	var delta = clock.getDelta(); // seconds.
-	var moveDistance1 = 200 * delta; // 200 pixels per second
-	var moveDistance2 = 200 * delta;
-	var moveDistance3 = 200 * delta;
-	var moveDistance4 = 200 * delta;
-	var moveDistance5 = 200 * delta;
-	
 	// KEYBOARD CONTROL
 	if ( keyboard.pressed("up") ) {
 		camera.position.y += 10;
-		blockd.position.y += 10;
 	}
 	if ( keyboard.pressed("down") ) {
 		if (camera.position.y > 50) {
 			camera.position.y -= 10;
-			blockd.position.y -= 10;
 		}
 	}
 	if ( keyboard.pressed("right") ) {
 		camera.position.x += 10;
-		blockd.position.x += 10;
 	}
 	if ( keyboard.pressed("left") ) {
 		camera.position.x -= 10;
-		blockd.position.x -= 10;
 	}
 	
 	// CUBE MOVEMENT
-		MovingCube1.position.z += moveDistance1 + mov1;
-		MovingCube2.position.z += moveDistance2 + mov2;
-		MovingCube3.position.z += moveDistance3 + mov3;
-		MovingCube4.position.z += moveDistance4 + mov4;
-		MovingCube5.position.z += moveDistance5 + mov5;
-	//}
-	
-	// RESETTING CUBES
-	if ( MovingCube1.position.z > 500) {
-		MovingCube1.position.z = 0;
-		MovingCube1.position.x = Math.floor(Math.random()*400 - 200);
-		MovingCube1.position.y = Math.floor(Math.random()*200 + 25.1);
-	}
-	if ( MovingCube2.position.z > 500) {
-		MovingCube2.position.z = 0;
-		MovingCube2.position.x = Math.floor(Math.random()*400 - 200);
-		MovingCube2.position.y = Math.floor(Math.random()*200 + 25.1);
-	}
-	if ( MovingCube3.position.z > 500) {
-		MovingCube3.position.z = 0;
-		MovingCube3.position.x = Math.floor(Math.random()*400 - 200);
-		MovingCube3.position.y = Math.floor(Math.random()*200 + 25.1);
-	}
-	if ( MovingCube4.position.z > 500) {
-		MovingCube4.position.z = 0;
-		MovingCube4.position.x = Math.floor(Math.random()*400 - 200);
-		MovingCube4.position.y = Math.floor(Math.random()*200 + 25.1);
-	}
-	if ( MovingCube5.position.z > 500) {
-		MovingCube5.position.z = 0;
-		MovingCube5.position.x = Math.floor(Math.random()*400 - 200);
-		MovingCube5.position.y = Math.floor(Math.random()*200 + 25.1);
-	}
-	
-	// BOUNCING AND MOVING CUBES
-	// NEED TO WORK ON CUBES FLYING OFF IN DISTANCE
-	if ( MovingCube1.position.z < -400) {
-		once1 = false;
-		if (side1 == false) {
-			moveDistance1 *= -1;
-			mov1 *= -1;
-			side1 = true;
-		}
-	}
-	if ( MovingCube2.position.z < -400) {
-		once2 = false;
-		if (side2 == false) {
-			moveDistance2 *= -1;
-			mov2 *= -1;
-			side2 = true;
-		}
-	}
-	if ( MovingCube3.position.z < -400) {
-		once3 = false;
-		if (side3 == false) {
-			moveDistance3 *= -1;
-			mov3 *= -1;
-			side3 = true;
-		}
-	}
-	if ( MovingCube4.position.z < -400) {
-		once4 = false;
-		if (side4 == false) {
-			moveDistance4 *= -1;
-			mov4 *= -1;
-			side4 = true;
-		}
-	}
-	if ( MovingCube5.position.z < -400) {
-		once5 = false;
-		if (side5 == false) {
-			moveDistance5 *= -1;
-			mov5 *= -1;
-			side5 = true;
-		}
-	}
+	movingCube1.move();
+	movingCube2.move();
+	movingCube3.move();
+	movingCube4.move();
+	movingCube5.move();
 	
 	
 	// COLLISION DETECTION
-	var originPoint = blockd.position.clone();
+	var originPoint = blockW.position.clone();
 	
-	for (var vertexIndex = 0; vertexIndex < blockd.geometry.vertices.length; vertexIndex++)
+	for (var vertexIndex = 0; vertexIndex < blockW.geometry.vertices.length; vertexIndex++)
 	{		
 		//console.log("Vertex " + vertexIndex);
-		var localVertex = blockd.geometry.vertices[vertexIndex].clone();
-		var globalVertex = localVertex.applyMatrix4( blockd.matrix );
-		var directionVector = globalVertex.sub( blockd.position );
+		var localVertex = blockW.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( blockW.matrix );
+		var directionVector = globalVertex.sub( blockW.position );
 		
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		// NEED TO SEPARATE COLLIDABLE MESH LIST
 		var collisionResults = ray.intersectObjects( collidableMeshList );
 		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
 			console.log("COLLISION");
-			if (once1 == false) {
-				side1 == false
-				moveDistance1 *= -1;
-				mov1 *= -1;
-				once1 = true;
-			}
-			if (once2 == false) {
-				side2 == false
-				moveDistance2 *= -1;
-				mov2 *= -1;
-				once2 = true;
-			}
-			if (once3 == false) {
-				side3 == false
-				moveDistance3 *= -1;
-				mov3 *= -1;
-				once3 = true;
-			}
-			if (once4 == false) {
-				side4 == false
-				moveDistance4 *= -1;
-				mov4 *= -1;
-				once4 = true;
-			}
-			if (once5 == false) {
-				side5 == false
-				moveDistance5 *= -1;
-				mov5 *= -1;
-				once5 = true;
-			}
+			movingCube1.bounceBack();
+			movingCube2.bounceBack();
+			movingCube3.bounceBack();
+			movingCube4.bounceBack();
+			movingCube5.bounceBack();
 			//play_multi_sound('multiaudio1');
 		}
 		else {
