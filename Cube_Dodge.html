@@ -187,10 +187,6 @@ function init()
   cubes.push(makeCube(50, 50, 50, -100, BLOCK_Y_POS, -400, 7));
   cubes.push(makeCube(50, 50, 50, 200, BLOCK_Y_POS, -400, 8));
   cubes.push(makeCube(50, 50, 50, -200, BLOCK_Y_POS, -400, 9));
-//	var movingCube2 = new MovingCube(50, 50, 50, 100, BLOCK_Y_POS, -400, 6);
-//	var movingCube3 = new MovingCube(50, 50, 50, -100, BLOCK_Y_POS, -400, 7);
-//	var movingCube4 = new MovingCube(50, 50, 50, 200, BLOCK_Y_POS, -400, 8);
-//	var movingCube5 = new MovingCube(50, 50, 50, -200, BLOCK_Y_POS, -400, 9);
 
 	// SOUND
 	play_single_sound();
@@ -229,7 +225,7 @@ function play_multi_sound(s) {
 
 function animate()
 {
-    requestAnimationFrame( animate );
+  requestAnimationFrame( animate );
 	render();
 	update();
 }
@@ -258,33 +254,24 @@ function update()
   cubes.forEach(function (cube) {
     cube.move();
   })
-	//movingCube1.move();
-	//movingCube2.move();
-	//movingCube3.move();
-	//movingCube4.move();
-	//movingCube5.move();
 
 
 	// COLLISION DETECTION
 	var originPoint = blockW.position.clone();
   blockW.localToWorld(originPoint);
-//  console.log(originPoint);
 	for (var vertexIndex = 0; vertexIndex < blockW.geometry.vertices.length; vertexIndex++)
 	{
-		//console.log("Vertex " + vertexIndex);
 		var localVertex = blockW.geometry.vertices[vertexIndex].clone();
 		var globalVertex = localVertex.applyMatrix4( blockW.matrix );
 		var directionVector = globalVertex.sub( blockW.position );
 
-    //console.log(directionVector.clone().normalize() );
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-		// NEED TO SEPARATE COLLIDABLE MESH LIST
     var collisionResults = ray.intersectObjects( cubes );
     var i = 0;
     collisionResults.forEach(function(collided) {
       if ( collided.distance < directionVector.length()) {
         collided.object.bounceBack();
-      //  play_multi_sound('multiaudio1');
+        //play_multi_sound('multiaudio1');
       }
     })
 
