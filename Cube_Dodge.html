@@ -59,11 +59,10 @@ var keyboard = new KeyboardState();
 
 // custom global variables
 var mesh;
-var movingCube1;
+var cubes = [];
 
 var BLOCK_Y_POS = 25.1;
 
-var collidableMeshList = [];
 
 var arrowList = [];
 var directionList = [];
@@ -124,44 +123,43 @@ function init()
 	// CUSTOM //
 	////////////
 
-	var MovingCube = function (cWidth, cHeight, cDepth, xPos, yPos, zPos, movVal) {
-		hitBlueBlock = false;
-		hitOtherSide = false;
-		delta = clock.getDelta();
-		moveDistance = 200 * delta;
-		mov = movVal;
+	var makeCube = function (cWidth, cHeight, cDepth, xPos, yPos, zPos, movVal) {
+		var hitBlueBlock = false;
+		var hitOtherSide = false;
+    var delta = clock.getDelta();
+    var moveDistance = 200 * delta;
+    var mov = movVal;
 
-
-		materialArray = [];
+    var materialArray = [];
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/ypos.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/yneg.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zpos.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/zneg.png' ) }));
-		MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
-		MovingCubeGeom = new THREE.CubeGeometry( cWidth, cHeight, cDepth, 1, 1, 1, materialArray );
+    var MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
+    var MovingCubeGeom = new THREE.CubeGeometry( cWidth, cHeight, cDepth, 1, 1, 1, materialArray );
 		mc = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
 		mc.position.set(xPos, BLOCK_Y_POS, zPos); // -200, 25.1, -400
-		collidableMeshList.push(mc);
 		scene.add( mc );
 
-		this.setPos = function(newX, newY, newZ) {
-			mc.position.x = newX;
-			mc.position.y = newY;
-			mc.position.z = newZ;
+
+    mc.setPos = function(newX, newY, newZ) {
+			this.position.x = newX;
+			this.position.y = newY;
+			this.position.z = newZ;
 		}
 
-		this.move = function() {
-			mc.position.z += moveDistance + mov;
+    mc.move = function() {
+			this.position.z += moveDistance + mov;
 
-			if ( mc.position.z > 500) {
+			if ( this.position.z > 500) {
         var xRand = Math.floor(Math.random()*400 - 200);
         var yRand = Math.floor(Math.random()*200 + 25.1);
         this.setPos(xRand, yRand, 0);
 			}
 
-			if ( mc.position.z < -400) {
+			if ( this.position.z < -400) {
 				hitOtherSide = false;
 				if (hitBlueBlock == false) {
 					moveDistance *= -1;
@@ -171,7 +169,7 @@ function init()
 			}
 		}
 
-		this.bounceBack = function() {
+		mc.bounceBack = function() {
 			if (hitOtherSide == false) {
 				hitBlueBlock = false
 				moveDistance *= -1;
@@ -179,10 +177,16 @@ function init()
 				hitOtherSide = true;
 			}
 		}
+
+    return mc;
 	}
 
 	// ADDING CUBES
-  movingCube1 = new MovingCube(50, 50, 50, 0, BLOCK_Y_POS, -400, 5);
+  cubes.push(makeCube(50, 50, 50, 0, BLOCK_Y_POS, -400, 5));
+  cubes.push(makeCube(50, 50, 50, 100, BLOCK_Y_POS, -400, 6));
+  cubes.push(makeCube(50, 50, 50, -100, BLOCK_Y_POS, -400, 7));
+  cubes.push(makeCube(50, 50, 50, 200, BLOCK_Y_POS, -400, 8));
+  cubes.push(makeCube(50, 50, 50, -200, BLOCK_Y_POS, -400, 9));
 //	var movingCube2 = new MovingCube(50, 50, 50, 100, BLOCK_Y_POS, -400, 6);
 //	var movingCube3 = new MovingCube(50, 50, 50, -100, BLOCK_Y_POS, -400, 7);
 //	var movingCube4 = new MovingCube(50, 50, 50, 200, BLOCK_Y_POS, -400, 8);
@@ -251,7 +255,10 @@ function update()
 	}
 
 	// CUBE MOVEMENT
-	movingCube1.move();
+  cubes.forEach(function (cube) {
+    cube.move();
+  })
+	//movingCube1.move();
 	//movingCube2.move();
 	//movingCube3.move();
 	//movingCube4.move();
@@ -272,19 +279,15 @@ function update()
     //console.log(directionVector.clone().normalize() );
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		// NEED TO SEPARATE COLLIDABLE MESH LIST
-    //console.log(collidableMeshList.length);
-		var collisionResults = ray.intersectObjects( collidableMeshList );
-    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-			movingCube1.bounceBack();
-			//movingCube2.bounceBack();
-			//movingCube3.bounceBack();
-		//	movingCube4.bounceBack();
-			//movingCube5.bounceBack();
-			//play_multi_sound('multiaudio1');
-		}
-		else {
-			//console.log("NO COLLISION");
-		}
+    var collisionResults = ray.intersectObjects( cubes );
+    var i = 0;
+    collisionResults.forEach(function(collided) {
+      if ( collided.distance < directionVector.length()) {
+        collided.object.bounceBack();
+      //  play_multi_sound('multiaudio1');
+      }
+    })
+
 	}
 	stats.update();
 }
