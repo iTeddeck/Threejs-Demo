@@ -13,7 +13,7 @@
 <script src="js/Stats.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/KeyboardState.js"></script>
-<script src="js/THREEx.FullScreen.js"></script> 
+<script src="js/THREEx.FullScreen.js"></script>
 <script src="js/THREEx.WindowResize.js"></script>
 
 <audio id="audiotag1" src="sounds/06 Far Horizons.mp3" preload="auto"></audio>
@@ -34,8 +34,8 @@
 <div id="infoButton"></div>
 <div id="infoBox" title="Demo Information">
 Controls: Press A/D to move continuously, press LEFT/RIGHT to move in discrete jumps,
-and press R to change color (will return to original color when key is released). 
-<br/><br/> 
+and press R to change color (will return to original color when key is released).
+<br/><br/>
 This three.js demo is part of a collection at
 <a href="http://stemkoski.github.io/Three.js/">http://stemkoski.github.io/Three.js/</a>
 </div>
@@ -59,9 +59,9 @@ var keyboard = new KeyboardState();
 
 // custom global variables
 var mesh;
+var movingCube1;
 
-var xRand = Math.floor(Math.random()*400 - 200);
-var yRand = Math.floor(Math.random()*200 + 25.1);
+var BLOCK_Y_POS = 25.1;
 
 var collidableMeshList = [];
 
@@ -71,8 +71,8 @@ var directionList = [];
 init();
 animate();
 
-// FUNCTIONS 		
-function init() 
+// FUNCTIONS
+function init()
 {
 	// SCENE
 	scene = new THREE.Scene();
@@ -82,12 +82,12 @@ function init()
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
 	camera.position.set(0,50,400);
-	camera.lookAt(scene.position);	
+	camera.lookAt(scene.position);
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
-		renderer = new THREE.CanvasRenderer(); 
+		renderer = new THREE.CanvasRenderer();
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
@@ -106,7 +106,7 @@ function init()
 	scene.add(light);
 	// FLOOR
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
@@ -119,19 +119,19 @@ function init()
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	scene.add(skyBox);
-	
+
 	////////////
 	// CUSTOM //
 	////////////
-	
+
 	var MovingCube = function (cWidth, cHeight, cDepth, xPos, yPos, zPos, movVal) {
 		hitBlueBlock = false;
 		hitOtherSide = false;
 		delta = clock.getDelta();
 		moveDistance = 200 * delta;
 		mov = movVal;
-		
-		
+
+
 		materialArray = [];
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xpos.png' ) }));
 		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/xneg.png' ) }));
@@ -142,23 +142,25 @@ function init()
 		MovingCubeMat = new THREE.MeshFaceMaterial(materialArray);
 		MovingCubeGeom = new THREE.CubeGeometry( cWidth, cHeight, cDepth, 1, 1, 1, materialArray );
 		mc = new THREE.Mesh( MovingCubeGeom, MovingCubeMat );
-		mc.position.set(xPos, yPos, zPos); // -200, 25.1, -400
+		mc.position.set(xPos, BLOCK_Y_POS, zPos); // -200, 25.1, -400
 		collidableMeshList.push(mc);
 		scene.add( mc );
-		
+
 		this.setPos = function(newX, newY, newZ) {
 			mc.position.x = newX;
 			mc.position.y = newY;
 			mc.position.z = newZ;
 		}
-		
+
 		this.move = function() {
 			mc.position.z += moveDistance + mov;
-			
+
 			if ( mc.position.z > 500) {
-				mc.setPos(xRand, yRand, 0);
+        var xRand = Math.floor(Math.random()*400 - 200);
+        var yRand = Math.floor(Math.random()*200 + 25.1);
+        this.setPos(xRand, yRand, 0);
 			}
-			
+
 			if ( mc.position.z < -400) {
 				hitOtherSide = false;
 				if (hitBlueBlock == false) {
@@ -168,7 +170,7 @@ function init()
 				}
 			}
 		}
-		
+
 		this.bounceBack = function() {
 			if (hitOtherSide == false) {
 				hitBlueBlock = false
@@ -178,17 +180,17 @@ function init()
 			}
 		}
 	}
-	
+
 	// ADDING CUBES
-	var movingCube1 = new MovingCube(50, 50, 50, 0, 25.1, -400, 5);
-	var movingCube2 = new MovingCube(50, 50, 50, 100, 25.1, -400, 6);
-	var movingCube3 = new MovingCube(50, 50, 50, -100, 25.1, -400, 7);
-	var movingCube4 = new MovingCube(50, 50, 50, 200, 25.1, -400, 8);
-	var movingCube5 = new MovingCube(50, 50, 50, -200, 25.1, -400, 9);
-	
+  movingCube1 = new MovingCube(50, 50, 50, 0, BLOCK_Y_POS, -400, 5);
+//	var movingCube2 = new MovingCube(50, 50, 50, 100, BLOCK_Y_POS, -400, 6);
+//	var movingCube3 = new MovingCube(50, 50, 50, -100, BLOCK_Y_POS, -400, 7);
+//	var movingCube4 = new MovingCube(50, 50, 50, 200, BLOCK_Y_POS, -400, 8);
+//	var movingCube5 = new MovingCube(50, 50, 50, -200, BLOCK_Y_POS, -400, 9);
+
 	// SOUND
 	play_single_sound();
-	
+
 	var channel_max = 5;	// number of channels
 	audiochannels = new Array();
 	for (a=0;a<channel_max;a++) {	// prepare the channels
@@ -196,15 +198,15 @@ function init()
 		audiochannels[a]['channel'] = new Audio();	// create a new audio object
 		audiochannels[a]['finished'] = -1;	// expected end time for this channel
 	}
-	
-	// BLOCK OBJECT	
+
+	// BLOCK OBJECT
 	var blockGeometry = new THREE.CubeGeometry( 120, 40, 20, 1, 1, 1 );
 	var blockMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} );
 	blockW = new THREE.Mesh(blockGeometry, blockMaterial);
-	blockW.position.set(0, -20, -100);
-	camera.add(blockW);
-	
-	
+	blockW.position.set(0, 0, -100);
+  camera.add(blockW);
+
+
 }
 
 // SOUND
@@ -221,17 +223,17 @@ function play_multi_sound(s) {
 	}
 }
 
-function animate() 
+function animate()
 {
     requestAnimationFrame( animate );
-	render();		
+	render();
 	update();
 }
 
 function update()
 {
 	keyboard.update();
-	
+
 	// KEYBOARD CONTROL
 	if ( keyboard.pressed("up") ) {
 		camera.position.y += 10;
@@ -247,35 +249,37 @@ function update()
 	if ( keyboard.pressed("left") ) {
 		camera.position.x -= 10;
 	}
-	
+
 	// CUBE MOVEMENT
 	movingCube1.move();
-	movingCube2.move();
-	movingCube3.move();
-	movingCube4.move();
-	movingCube5.move();
-	
-	
+	//movingCube2.move();
+	//movingCube3.move();
+	//movingCube4.move();
+	//movingCube5.move();
+
+
 	// COLLISION DETECTION
 	var originPoint = blockW.position.clone();
-	
+  blockW.localToWorld(originPoint);
+//  console.log(originPoint);
 	for (var vertexIndex = 0; vertexIndex < blockW.geometry.vertices.length; vertexIndex++)
-	{		
+	{
 		//console.log("Vertex " + vertexIndex);
 		var localVertex = blockW.geometry.vertices[vertexIndex].clone();
 		var globalVertex = localVertex.applyMatrix4( blockW.matrix );
 		var directionVector = globalVertex.sub( blockW.position );
-		
+
+    //console.log(directionVector.clone().normalize() );
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		// NEED TO SEPARATE COLLIDABLE MESH LIST
+    //console.log(collidableMeshList.length);
 		var collisionResults = ray.intersectObjects( collidableMeshList );
-		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-			console.log("COLLISION");
+    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
 			movingCube1.bounceBack();
-			movingCube2.bounceBack();
-			movingCube3.bounceBack();
-			movingCube4.bounceBack();
-			movingCube5.bounceBack();
+			//movingCube2.bounceBack();
+			//movingCube3.bounceBack();
+		//	movingCube4.bounceBack();
+			//movingCube5.bounceBack();
 			//play_multi_sound('multiaudio1');
 		}
 		else {
@@ -285,7 +289,7 @@ function update()
 	stats.update();
 }
 
-function render() 
+function render()
 {
 	renderer.render( scene, camera );
 }
