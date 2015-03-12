@@ -65,21 +65,23 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 			"	colorL = texture2D( mapLeft, uv );",
 			"	colorR = texture2D( mapRight, uv );",
 
-			// http://3dtv.at/Knowhow/AnaglyphComparison_en.aspx
+				// http://3dtv.at/Knowhow/AnaglyphComparison_en.aspx
 
 			"	gl_FragColor = vec4( colorL.g * 0.7 + colorL.b * 0.3, colorR.g, colorR.b, colorL.a + colorR.a ) * 1.1;",
-			
+
 			"}"
 
 		].join("\n")
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {
 
+		if ( _renderTargetL ) _renderTargetL.dispose();
+		if ( _renderTargetR ) _renderTargetR.dispose();
 		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
 		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
@@ -164,5 +166,10 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 		renderer.render( _scene, _camera );
 
 	};
+
+	this.dispose = function() {
+		if ( _renderTargetL ) _renderTargetL.dispose();
+		if ( _renderTargetR ) _renderTargetR.dispose();
+	}
 
 };
