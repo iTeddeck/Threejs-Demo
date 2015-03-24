@@ -54,6 +54,7 @@ This three.js demo is part of a collection at
 
 // standard global variables
 var container, scene, camera, renderer, controls, stats;
+var cameraActive = true;
 var clock = new THREE.Clock();
 
 var keyboard = new KeyboardState();
@@ -76,24 +77,23 @@ function init()
 {
 	// SCENE
 	scene = new THREE.Scene();
-	// CAMERA
+	// CAMERA 1 - FPS
 	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
 	var VIEW_ANGLE = 90, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
 	camera.position.set(0,50,400);
 	camera.lookAt(scene.position);
+	// CAMERA 2 - OCULUS
+	effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+	effect.setSize( window.innerWidth, window.innerHeight );
+	scene.add(effect);
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
 		renderer = new THREE.CanvasRenderer();
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-  effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
-  effect.setSize( window.innerWidth, window.innerHeight );
-
-
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
 	// EVENTS
@@ -307,9 +307,17 @@ function update()
 	}
 
 	// CUBE MOVEMENT
-  cubes.forEach(function (cube) {
-    cube.move();
-  })
+	cubes.forEach(function (cube) {
+		cube.move();
+	})
+  
+	// SWITCHING CAMERAS
+	if ( keyboard.pressed("n") ) {
+		cameraActive = true;
+	}
+	if ( keyboard.pressed("o") ) {
+		cameraActive = false;
+	} 
 
 
 	// COLLISION DETECTION
@@ -337,8 +345,12 @@ function update()
 
 function render()
 {
-	///renderer.render( scene, camera );
-  effect.render( scene, camera );
+	if (cameraActive) {
+		renderer.render( scene, camera );
+	}
+	else {
+		effect.render( scene, camera );
+	}
 }
 
 </script>
