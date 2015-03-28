@@ -84,10 +84,6 @@ function init()
 	scene.add(camera);
 	camera.position.set(0,50,400);
 	camera.lookAt(scene.position);
-	// CAMERA 2 - OCULUS
-	effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
-	effect.setSize( window.innerWidth, window.innerHeight );
-	scene.add(effect);
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
@@ -167,6 +163,11 @@ function init()
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
+	
+	// CAMERA 2 - OCULUS
+	effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+	effect.setSize( window.innerWidth, window.innerHeight );
+	scene.add(effect);
 
 	////////////
 	// CUSTOM //
@@ -314,9 +315,11 @@ function update()
 	// SWITCHING CAMERAS
 	if ( keyboard.pressed("n") ) {
 		cameraActive = true;
+		console.log("n");
 	}
 	if ( keyboard.pressed("o") ) {
 		cameraActive = false;
+		console.log("o");
 	} 
 
 
