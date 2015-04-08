@@ -163,7 +163,7 @@ function init()
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
-	
+
 	// CAMERA 2 - OCULUS
 	effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
 	effect.setSize( window.innerWidth, window.innerHeight );
@@ -311,16 +311,16 @@ function update()
 	cubes.forEach(function (cube) {
 		cube.move();
 	})
-  
-	// SWITCHING CAMERAS
-	if ( keyboard.pressed("n") ) {
+
+  // SWITCHING CAMERAS
+	if ( keyboard.pressed("pageup") ) {
 		cameraActive = true;
 		console.log("n");
 	}
-	if ( keyboard.pressed("o") ) {
+	if ( keyboard.pressed("pagedown") ) {
 		cameraActive = false;
 		console.log("o");
-	} 
+	}
 
 
 	// COLLISION DETECTION
