@@ -313,11 +313,11 @@ function update()
 	})
 
   // SWITCHING CAMERAS
-	if ( keyboard.pressed("pageup") ) {
+	if ( keyboard.pressed("N") ) {
 		cameraActive = true;
 		console.log("n");
 	}
-	if ( keyboard.pressed("pagedown") ) {
+	if ( keyboard.pressed("O") ) {
 		cameraActive = false;
 		console.log("o");
 	}
@@ -348,7 +348,9 @@ function update()
 
 function render()
 {
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
 	if (cameraActive) {
+		renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 		renderer.render( scene, camera );
 	}
 	else {
